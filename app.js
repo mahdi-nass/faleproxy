@@ -12,9 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route to serve the main page
-app.get('/', (req, res) => {
+function serveMainPage(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+}
+
+app.get('/', serveMainPage);
 
 // API endpoint to fetch and modify content
 app.post('/fetch', async (req, res) => {
@@ -33,9 +35,9 @@ app.post('/fetch', async (req, res) => {
     const $ = cheerio.load(html);
     
     // Process text nodes in the body
-    $('body *').contents().filter(function() {
+    $('body *').contents().filter(function isTextNode() {
       return this.nodeType === 3; // Text nodes only
-    }).each(function() {
+    }).each(function replaceText() {
       // Replace text content but not in URLs or attributes
       const text = $(this).text();
       // Use word boundaries and case-preserving replacement
